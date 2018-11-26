@@ -1,0 +1,38 @@
+---
+title: "step_2"
+author: "Charlie Olmert"
+date: "11/26/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(janitor)
+library(readxl)
+library(stringr)
+library(tidyverse)
+
+```
+
+```{r echo = FALSE}
+my_tib_2 <- tibble_1 %>% 
+  select(vote, precinct, ballot_style, choice_1, vote_id) %>% 
+  filter(str_detect(choice_1, "Poliquin") |
+           str_detect(choice_1, "Golden") |
+           str_detect(choice_1, "Bond")) %>% 
+  mutate(choice_1 = case_when(choice_1 == "REP Poliquin, Bruce (5931)" ~ "Poliquin",
+                              choice_1 == "DEM Golden, Jared F. (5471)" ~ "Golden",
+                              choice_1 == "Bond, Tiffany L." ~ "Bond")) %>% 
+  filter(!is.na(choice_1)) 
+
+my_tib_2$choice_1 <- factor(my_tib_2$choice_1, levels=c("Golden", "Bond", "Poliquin"))
+# Re-order the data.frame
+my_tib_2 <- my_tib_2[order(my_tib_2$choice_1),]
+                 
+
+names(my_tib_2)[names(my_tib_2) == 'choice_1'] <- "candidate"
+
+my_tib_2 <- my_tib_2[c("vote_id", "precinct", "ballot_style", "candidate", "vote")]
+```
+
